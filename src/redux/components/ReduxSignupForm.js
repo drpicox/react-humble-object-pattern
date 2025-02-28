@@ -1,4 +1,4 @@
-// src/redux/components/HumbleSignupForm.js
+// src/redux/components/ReduxSignupForm.js
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
@@ -8,9 +8,9 @@ import {
   selectUsername,
   selectPassword,
   selectMessage
-} from '../controllers/SignupController';
+} from '../signupSlice';
 
-export function HumbleSignupForm() {
+export function ReduxSignupForm() {
     const dispatch = useDispatch();
     const username = useSelector(selectUsername);
     const password = useSelector(selectPassword);

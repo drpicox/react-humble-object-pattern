@@ -1,13 +1,15 @@
-// src/redux/controllers/__tests__/SignupController.test.js
+// src/redux/__tests__/signupSlice.test.js
 import signupReducer, { 
   setUsername, 
   setPassword, 
   validate, 
   isStrongPassword 
-} from '../SignupController';
+} from '../signupSlice';
+import { startTimeMeasurement, endTimeMeasurement, logTestTime } from '../utils/testUtils';
 
-describe('SignupController', () => {
+describe('Signup Redux Slice', () => {
   let initialState;
+  let startTime;
 
   beforeEach(() => {
     initialState = {
@@ -15,6 +17,12 @@ describe('SignupController', () => {
       password: '',
       message: ''
     };
+    startTime = startTimeMeasurement();
+  });
+
+  afterEach(() => {
+    const testTime = endTimeMeasurement(startTime);
+    logTestTime('Signup Redux Slice', testTime);
   });
 
   describe('Actions and reducers', () => {

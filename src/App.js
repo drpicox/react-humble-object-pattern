@@ -6,9 +6,8 @@ import './App.css';
 import { HumbleSignupForm as PlainHumbleSignupForm } from './plain/components/HumbleSignupForm';
 import { SmartSignupForm as PlainSmartSignupForm } from './plain/components/SmartSignupForm';
 
-// Redux implementations
-import { HumbleSignupForm as ReduxHumbleSignupForm } from './redux/components/HumbleSignupForm';
-import { SmartSignupForm as ReduxSmartSignupForm } from './redux/components/SmartSignupForm';
+// Redux implementation
+import { ReduxSignupForm } from './redux/components/ReduxSignupForm';
 import reduxStore from './redux/store';
 
 function App() {
@@ -17,11 +16,16 @@ function App() {
 
   // Determine which component to render based on user selection
   let FormComponent;
+  
   if (implementation === 'plain') {
     FormComponent = componentType === 'humble' ? PlainHumbleSignupForm : PlainSmartSignupForm;
   } else {
-    FormComponent = componentType === 'humble' ? ReduxHumbleSignupForm : ReduxSmartSignupForm;
+    // In Redux implementation, we only have one component type
+    FormComponent = ReduxSignupForm;
   }
+
+  // Component type selection is disabled for Redux implementation
+  const isComponentSelectionDisabled = implementation === 'redux';
 
   return (
     <div className="App">
@@ -49,7 +53,11 @@ function App() {
               name="implementation"
               value="redux"
               checked={implementation === 'redux'}
-              onChange={() => setImplementation('redux')}
+              onChange={() => {
+                setImplementation('redux');
+                // Component type doesn't matter for Redux
+                setComponentType('humble');
+              }}
             />
             Redux
           </label>
@@ -57,32 +65,36 @@ function App() {
 
         <div>
           <h3>Component Type:</h3>
-          <label>
+          <label className={isComponentSelectionDisabled ? 'disabled' : ''}>
             <input
               type="radio"
               name="componentType"
               value="humble"
               checked={componentType === 'humble'}
               onChange={() => setComponentType('humble')}
+              disabled={isComponentSelectionDisabled}
             />
-            Humble Component
+            Humble Component {isComponentSelectionDisabled && '(N/A for Redux)'}
           </label>
-          <label>
+          <label className={isComponentSelectionDisabled ? 'disabled' : ''}>
             <input
               type="radio"
               name="componentType"
               value="smart"
               checked={componentType === 'smart'}
               onChange={() => setComponentType('smart')}
+              disabled={isComponentSelectionDisabled}
             />
-            Smart Component
+            Smart Component {isComponentSelectionDisabled && '(N/A for Redux)'}
           </label>
         </div>
       </div>
 
       <div className="form-container">
         <h3>
-          {implementation === 'plain' ? 'Plain' : 'Redux'} {componentType === 'humble' ? 'Humble' : 'Smart'} Component
+          {implementation === 'plain' 
+            ? `Plain ${componentType === 'humble' ? 'Humble' : 'Smart'} Component`
+            : 'Redux Component'}
         </h3>
         {implementation === 'redux' ? (
           <Provider store={reduxStore}>

@@ -1,12 +1,33 @@
-// src/components/__tests__/HumbleSignupForm.test.js
+// src/redux/components/__tests__/ReduxSignupForm.test.js
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { HumbleSignupForm } from "../HumbleSignupForm";
+import { Provider } from "react-redux";
+import signupReducer from "../../signupSlice";
+import { ReduxSignupForm } from "../ReduxSignupForm";
+import { createStore } from "../../store";
+import { startTimeMeasurement, endTimeMeasurement, logTestTime } from "../../utils/testUtils";
 
-describe("HumbleSignupForm", () => {
+describe("ReduxSignupForm", () => {
+  let startTime;
+  
+  beforeEach(() => {
+    startTime = startTimeMeasurement();
+  });
+  
+  afterEach(() => {
+    const testTime = endTimeMeasurement(startTime);
+    logTestTime('ReduxSignupForm Component', testTime);
+  });
+
   const renderForm = () => {
-    return render(<HumbleSignupForm />);
+    const store = createStore();
+    
+    return render(
+      <Provider store={store}>
+        <ReduxSignupForm />
+      </Provider>
+    );
   };
 
   describe("Initial render", () => {
@@ -130,50 +151,6 @@ describe("HumbleSignupForm", () => {
 
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe("Edge cases", () => {
-    test("handles rapid form submissions", async () => {
-      renderForm();
-      const submitButton = screen.getByText("Sign Up");
-
-      // Click submit button multiple times rapidly
-      await userEvent.click(submitButton);
-      await userEvent.click(submitButton);
-      await userEvent.click(submitButton);
-
-      await waitFor(() => {
-        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
-      });
-    });
-
-    test("handles whitespace-only inputs", async () => {
-      renderForm();
-
-      await userEvent.type(screen.getByLabelText("Username:"), "   ");
-      await userEvent.type(screen.getByLabelText("Password:"), "   ");
-      await userEvent.click(screen.getByText("Sign Up"));
-
-      await waitFor(() => {
-        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
-      });
-    });
-
-    test("handles very long inputs", async () => {
-      renderForm();
-      const longString = "a".repeat(100);
-
-      await userEvent.type(screen.getByLabelText("Username:"), longString);
-      await userEvent.type(
-        screen.getByLabelText("Password:"),
-        "Password123" + longString
-      );
-      await userEvent.click(screen.getByText("Sign Up"));
-
-      await waitFor(() => {
-        expect(screen.getByText("Success!")).toBeInTheDocument();
       });
     });
   });

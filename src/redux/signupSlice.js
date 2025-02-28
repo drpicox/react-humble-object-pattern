@@ -1,4 +1,4 @@
-// src/redux/controllers/SignupController.js
+// src/redux/signupSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 // Define initial state

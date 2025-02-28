@@ -1,11 +1,14 @@
 // src/redux/store.js
 import { configureStore } from '@reduxjs/toolkit';
-import signupReducer from './controllers/SignupController';
+import signupReducer from './signupSlice';
 
-const store = configureStore({
-  reducer: {
-    signup: signupReducer,
-  },
-});
+export function createStore() {
+  return configureStore({
+    reducer: {
+      signup: signupReducer,
+    },
+  });
+}
 
+const store = createStore();
 export default store;
