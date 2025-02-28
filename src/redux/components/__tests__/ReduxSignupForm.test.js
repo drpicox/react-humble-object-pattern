@@ -146,4 +146,48 @@ describe("ReduxSignupForm", () => {
       });
     });
   });
+
+  describe("Edge cases", () => {
+    test("handles rapid form submissions", async () => {
+      renderForm();
+      const submitButton = screen.getByText("Sign Up");
+
+      // Click submit button multiple times rapidly
+      await userEvent.click(submitButton);
+      await userEvent.click(submitButton);
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+      });
+    });
+
+    test("handles whitespace-only inputs", async () => {
+      renderForm();
+
+      await userEvent.type(screen.getByLabelText("Username:"), "   ");
+      await userEvent.type(screen.getByLabelText("Password:"), "   ");
+      await userEvent.click(screen.getByText("Sign Up"));
+
+      await waitFor(() => {
+        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+      });
+    });
+
+    test("handles very long inputs", async () => {
+      renderForm();
+      const longString = "a".repeat(100);
+
+      await userEvent.type(screen.getByLabelText("Username:"), longString);
+      await userEvent.type(
+        screen.getByLabelText("Password:"),
+        "Password123" + longString
+      );
+      await userEvent.click(screen.getByText("Sign Up"));
+
+      await waitFor(() => {
+        expect(screen.getByText("Success!")).toBeInTheDocument();
+      });
+    });
+  });
 });
