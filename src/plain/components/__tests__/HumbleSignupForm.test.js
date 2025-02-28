@@ -1,10 +1,14 @@
-// src/components/__tests__/HumbleSignupForm.test.js
+// src/plain/components/__tests__/HumbleSignupForm.test.js
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HumbleSignupForm } from "../HumbleSignupForm";
+import { configureSuiteTimer } from "../../../utils/timeUtils";
 
 describe("HumbleSignupForm", () => {
+  // Configure timer for the entire test suite
+  configureSuiteTimer('Plain Humble Component');
+  
   const renderForm = () => {
     return render(<HumbleSignupForm />);
   };

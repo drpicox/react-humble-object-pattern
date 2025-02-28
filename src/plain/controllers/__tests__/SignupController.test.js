@@ -1,8 +1,12 @@
-// src/controllers/__tests__/SignupController.test.js
+// src/plain/controllers/__tests__/SignupController.test.js
 import { SignupController } from '../SignupController';
 import { createTestController } from '../../utils/testUtils';
+import { configureSuiteTimer } from '../../../utils/timeUtils';
 
 describe('SignupController', () => {
+    // Configure timer for the entire test suite
+    configureSuiteTimer('Plain Controller');
+    
     let controller;
 
     beforeEach(() => {

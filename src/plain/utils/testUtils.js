@@ -1,5 +1,17 @@
 // src/plain/utils/testUtils.js
 
+// Import shared time measurement utilities
+export { 
+  startTimeMeasurement, 
+  endTimeMeasurement, 
+  logTestTime 
+} from '../../utils/timeUtils';
+
+/**
+ * Creates a test controller with spies for testing
+ * @param {Class} Controller - The controller class to create a test instance of
+ * @returns {Object} A proxied controller instance with spies
+ */
 export function createTestController(Controller) {
     const originalInstance = new Controller();
     const proxiedInstance = {};
@@ -38,19 +50,4 @@ export function createTestController(Controller) {
     });
 
     return proxiedInstance;
-}
-
-// Helper for timing tests
-export function startTimeMeasurement() {
-  return process.hrtime();
-}
-
-export function endTimeMeasurement(start) {
-  const diff = process.hrtime(start);
-  const timeInMs = (diff[0] * 1e9 + diff[1]) / 1e6;
-  return timeInMs;
-}
-
-export function logTestTime(testName, timeInMs) {
-  console.log(`🕒 ${testName}: ${timeInMs.toFixed(2)}ms`);
 }

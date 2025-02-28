@@ -1,10 +1,14 @@
-// src/components/__tests__/SmartSignupForm.test.js
+// src/plain/components/__tests__/SmartSignupForm.test.js
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SmartSignupForm } from "../SmartSignupForm";
+import { configureSuiteTimer } from "../../../utils/timeUtils";
 
 describe("SmartSignupForm", () => {
+  // Configure timer for the entire test suite
+  configureSuiteTimer('Plain Smart Component');
+  
   const renderForm = () => {
     return render(<SmartSignupForm />);
   };

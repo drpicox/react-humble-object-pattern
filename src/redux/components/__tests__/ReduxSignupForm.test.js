@@ -6,19 +6,11 @@ import { Provider } from "react-redux";
 import signupReducer from "../../signupSlice";
 import { ReduxSignupForm } from "../ReduxSignupForm";
 import { createStore } from "../../store";
-import { startTimeMeasurement, endTimeMeasurement, logTestTime } from "../../utils/testUtils";
+import { configureSuiteTimer } from "../../../utils/timeUtils";
 
 describe("ReduxSignupForm", () => {
-  let startTime;
-  
-  beforeEach(() => {
-    startTime = startTimeMeasurement();
-  });
-  
-  afterEach(() => {
-    const testTime = endTimeMeasurement(startTime);
-    logTestTime('ReduxSignupForm Component', testTime);
-  });
+  // Configure timer for the entire test suite
+  configureSuiteTimer('Redux Component');
 
   const renderForm = () => {
     const store = createStore();

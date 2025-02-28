@@ -5,11 +5,13 @@ import signupReducer, {
   validate, 
   isStrongPassword 
 } from '../signupSlice';
-import { startTimeMeasurement, endTimeMeasurement, logTestTime } from '../utils/testUtils';
+import { configureSuiteTimer } from '../../utils/timeUtils';
 
-describe('Signup Redux Slice', () => {
+describe('Redux Signup Slice', () => {
+  // Configure timer for the entire test suite
+  configureSuiteTimer('Redux Slice');
+  
   let initialState;
-  let startTime;
 
   beforeEach(() => {
     initialState = {
@@ -17,12 +19,6 @@ describe('Signup Redux Slice', () => {
       password: '',
       message: ''
     };
-    startTime = startTimeMeasurement();
-  });
-
-  afterEach(() => {
-    const testTime = endTimeMeasurement(startTime);
-    logTestTime('Signup Redux Slice', testTime);
   });
 
   describe('Actions and reducers', () => {
