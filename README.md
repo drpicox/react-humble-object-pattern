@@ -1,28 +1,28 @@
-# Testing Strategies Performance Analysis
+# React Testing Strategies: Performance Analysis
 
 ## Overview
-This research compares different testing approaches for React applications, specifically analyzing the performance implications of testing business logic in isolation versus within React components.
+This project compares different testing approaches for React applications, focusing on the performance implications of testing business logic in isolation versus within React components.
 
 ## Implementation Approaches
 
-### 1. Controller Pattern
-- Separates business logic into a standalone controller class
-- Uses a custom hook (`useController`) to connect the controller with React components
-- Allows testing business logic in isolation without React dependencies
+### 1. Plain React Implementation
+- Located in `/src/plain` directory
+- Uses the following patterns:
+  - **Controller Pattern**: Separates business logic into a standalone controller class
+  - **Smart Component**: Traditional React component with embedded business logic
+  - **Humble Component**: Uses the Controller pattern with minimal UI logic
 
-### 2. Smart Component
-- Traditional React component with embedded business logic
-- Uses React hooks (useState) to manage state
-- Business logic is tightly coupled with the component
-
-### 3. Humble Component
-- Uses the Controller pattern
-- Component focuses only on rendering and delegating to controller
-- Separates concerns while maintaining full functionality
+### 2. Redux Implementation
+- Located in `/src/redux` directory
+- Uses Redux for state management
+- Implements the same patterns as the Plain React version:
+  - **Controller Pattern**: Using Redux slices and actions
+  - **Smart Component**: Component with local state that dispatches to Redux
+  - **Humble Component**: Pure presentational component connected to Redux
 
 ## Test Implementation
 
-Each approach was tested with equivalent functionality:
+Each approach is tested with equivalent functionality:
 - Username validation
 - Password strength validation (length, uppercase, numbers)
 - Form submission handling
@@ -33,11 +33,10 @@ Test suites cover:
 - Edge cases
 - User interactions
 - Error handling
-- Unicode support
 
 ## Performance Results
 
-Test execution times over 5 runs:
+### Plain React Results:
 
 | Approach          | Average Time | Notes                           |
 |------------------|--------------|--------------------------------|
@@ -45,18 +44,21 @@ Test execution times over 5 runs:
 | Smart Component  | 761.47ms     | Full React component testing   |
 | Humble Component | 759.97ms     | Full React component testing   |
 
-### Key Findings
+### Redux Results:
+(Results will appear after implementation and testing)
+
+## Key Findings
 
 1. **Speedup Factor**: Testing the controller in isolation is 111x faster than testing either component approach.
 
 2. **Component Comparison**: 
-   - Smart vs Humble components show negligible performance difference (~1.5ms)
+   - Smart vs Humble components show negligible performance difference
    - The rendering and user event simulation overhead dominates the test execution time
-   - The location of business logic (in component vs controller) has minimal impact on test performance
+   - The location of business logic has minimal impact on test performance
 
 3. **Test Stability**:
    - Controller tests show high consistency (variance: 6.64ms - 7.20ms)
-   - Component tests show higher but similar variance in both approaches
+   - Component tests show higher but similar variance
 
 ## Conclusions
 
@@ -69,19 +71,14 @@ Test execution times over 5 runs:
    - Use component tests for critical user interaction flows
    - Consider the 111x speedup when designing test strategies for large applications
 
-## Implementation Details
-
-The complete implementation includes:
-- Base Controller class
-- SignupController implementation
-- React hooks for controller integration
-- Test utilities for controller testing
-- Equivalent React components (Smart and Humble)
-- Comprehensive test suites for each approach
-
 ## Usage
 
-To run the tests and see timing results:
+### Running the Application
+```bash
+npm start
+```
+
+### Running Tests
 ```bash
 npm test
 ```
@@ -90,3 +87,8 @@ Each test suite will output its execution time with the format:
 ```
 🕒 SuiteName: XXX.XXms
 ```
+
+### Viewing the Demo
+The application includes a UI to switch between different implementations:
+- Choose between Plain React or Redux implementation
+- Switch between Smart and Humble Components
