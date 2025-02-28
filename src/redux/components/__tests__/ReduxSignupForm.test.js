@@ -7,9 +7,10 @@ import { ReduxSignupForm } from "../ReduxSignupForm";
 import { createStore } from "../../store";
 import { configureSuiteTimer } from "../../../utils/timeUtils";
 
+configureSuiteTimer("Redux Singup Component");
+
 describe("ReduxSignupForm", () => {
   // Configure timer for the entire test suite
-  configureSuiteTimer("Redux Component");
 
   const renderForm = () => {
     const store = createStore();
@@ -33,10 +34,10 @@ describe("ReduxSignupForm", () => {
     test("handles empty username", async () => {
       renderForm();
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(passwordInput, "Password123");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
@@ -46,11 +47,11 @@ describe("ReduxSignupForm", () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(usernameInput, "   ");
       await userEvent.type(passwordInput, "Password123");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
@@ -60,7 +61,7 @@ describe("ReduxSignupForm", () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const longString = "a".repeat(100);
-      
+
       await userEvent.type(usernameInput, longString);
       expect(usernameInput).toHaveValue(longString);
     });
@@ -68,7 +69,7 @@ describe("ReduxSignupForm", () => {
     test("handles special characters in username", async () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
-      
+
       await userEvent.type(usernameInput, "user@123!");
       expect(usernameInput).toHaveValue("user@123!");
     });
@@ -80,11 +81,11 @@ describe("ReduxSignupForm", () => {
         renderForm();
         const usernameInput = screen.getByLabelText("Username:");
         const passwordInput = screen.getByLabelText("Password:");
-        
+
         await userEvent.type(usernameInput, "john");
         await userEvent.type(passwordInput, "Password123");
         await userEvent.click(screen.getByText("Sign Up"));
-        
+
         await waitFor(() => {
           expect(screen.getByText("Success!")).toBeInTheDocument();
         });
@@ -94,11 +95,11 @@ describe("ReduxSignupForm", () => {
         renderForm();
         const usernameInput = screen.getByLabelText("Username:");
         const passwordInput = screen.getByLabelText("Password:");
-        
+
         await userEvent.type(usernameInput, "john");
         await userEvent.type(passwordInput, "Pass1");
         await userEvent.click(screen.getByText("Sign Up"));
-        
+
         await waitFor(() => {
           expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
         });
@@ -108,11 +109,11 @@ describe("ReduxSignupForm", () => {
         renderForm();
         const usernameInput = screen.getByLabelText("Username:");
         const passwordInput = screen.getByLabelText("Password:");
-        
+
         await userEvent.type(usernameInput, "john");
         await userEvent.type(passwordInput, "password123");
         await userEvent.click(screen.getByText("Sign Up"));
-        
+
         await waitFor(() => {
           expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
         });
@@ -122,11 +123,11 @@ describe("ReduxSignupForm", () => {
         renderForm();
         const usernameInput = screen.getByLabelText("Username:");
         const passwordInput = screen.getByLabelText("Password:");
-        
+
         await userEvent.type(usernameInput, "john");
         await userEvent.type(passwordInput, "Password");
         await userEvent.click(screen.getByText("Sign Up"));
-        
+
         await waitFor(() => {
           expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
         });
@@ -136,11 +137,11 @@ describe("ReduxSignupForm", () => {
         renderForm();
         const usernameInput = screen.getByLabelText("Username:");
         const passwordInput = screen.getByLabelText("Password:");
-        
+
         await userEvent.type(usernameInput, "john");
         await userEvent.type(passwordInput, "Password123!@#");
         await userEvent.click(screen.getByText("Sign Up"));
-        
+
         await waitFor(() => {
           expect(screen.getByText("Success!")).toBeInTheDocument();
         });
@@ -151,11 +152,11 @@ describe("ReduxSignupForm", () => {
         const usernameInput = screen.getByLabelText("Username:");
         const passwordInput = screen.getByLabelText("Password:");
         const longPassword = "Password123" + "a".repeat(50);
-        
+
         await userEvent.type(usernameInput, "john");
         await userEvent.type(passwordInput, longPassword);
         await userEvent.click(screen.getByText("Sign Up"));
-        
+
         await waitFor(() => {
           expect(screen.getByText("Success!")).toBeInTheDocument();
         });
@@ -165,7 +166,7 @@ describe("ReduxSignupForm", () => {
     test("updates state when password changes", async () => {
       renderForm();
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(passwordInput, "newpassword");
       expect(passwordInput).toHaveValue("newpassword");
     });
@@ -173,10 +174,10 @@ describe("ReduxSignupForm", () => {
     test("handles empty password", async () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
-      
+
       await userEvent.type(usernameInput, "john");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
@@ -186,11 +187,11 @@ describe("ReduxSignupForm", () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(usernameInput, "john");
       await userEvent.type(passwordInput, "        ");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
@@ -202,11 +203,11 @@ describe("ReduxSignupForm", () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(usernameInput, "john");
       await userEvent.type(passwordInput, "Password123");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Success!")).toBeInTheDocument();
       });
@@ -216,11 +217,11 @@ describe("ReduxSignupForm", () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(usernameInput, "john");
       await userEvent.type(passwordInput, "weak");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
@@ -229,10 +230,10 @@ describe("ReduxSignupForm", () => {
     test("error message when only password is valid", async () => {
       renderForm();
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(passwordInput, "Password123");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
@@ -241,7 +242,7 @@ describe("ReduxSignupForm", () => {
     test("error message when both credentials are invalid", async () => {
       renderForm();
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
@@ -251,21 +252,21 @@ describe("ReduxSignupForm", () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       // First submit with invalid data
       await userEvent.type(usernameInput, "john");
       await userEvent.type(passwordInput, "weak");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
-      
+
       // Fix the password and resubmit
       await userEvent.clear(passwordInput);
       await userEvent.type(passwordInput, "Password123");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Success!")).toBeInTheDocument();
       });
@@ -275,16 +276,16 @@ describe("ReduxSignupForm", () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(usernameInput, "john");
       await userEvent.type(passwordInput, "Password123");
-      
+
       // Validate multiple times
       await userEvent.click(screen.getByText("Sign Up"));
       await waitFor(() => {
         expect(screen.getByText("Success!")).toBeInTheDocument();
       });
-      
+
       await userEvent.click(screen.getByText("Sign Up"));
       expect(screen.getByText("Success!")).toBeInTheDocument();
     });
@@ -295,17 +296,17 @@ describe("ReduxSignupForm", () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(usernameInput, "john");
       await userEvent.clear(usernameInput);
       await userEvent.type(usernameInput, "jane");
-      
+
       await userEvent.type(passwordInput, "Password123");
       await userEvent.clear(passwordInput);
       await userEvent.type(passwordInput, "Password456");
-      
+
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Success!")).toBeInTheDocument();
       });
@@ -315,11 +316,11 @@ describe("ReduxSignupForm", () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(usernameInput, "사용자");
       await userEvent.type(passwordInput, "Password123");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Success!")).toBeInTheDocument();
       });
@@ -329,11 +330,11 @@ describe("ReduxSignupForm", () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-      
+
       await userEvent.type(usernameInput, "john");
       await userEvent.type(passwordInput, "Password123한글");
       await userEvent.click(screen.getByText("Sign Up"));
-      
+
       await waitFor(() => {
         expect(screen.getByText("Success!")).toBeInTheDocument();
       });
