@@ -13,27 +13,8 @@ describe("SmartSignupForm", () => {
     return render(<SmartSignupForm />);
   };
 
-  describe("Initial render", () => {
-    test("renders all form elements", () => {
-      renderForm();
-
-      expect(screen.getByLabelText("Username:")).toBeInTheDocument();
-      expect(screen.getByLabelText("Password:")).toBeInTheDocument();
-      expect(screen.getByText("Sign Up")).toBeInTheDocument();
-    });
-
-    test("starts with empty fields", () => {
-      renderForm();
-
-      expect(screen.getByLabelText("Username:")).toHaveValue("");
-      expect(screen.getByLabelText("Password:")).toHaveValue("");
-      expect(screen.queryByText("Success!")).not.toBeInTheDocument();
-      expect(screen.queryByText("Invalid credentials")).not.toBeInTheDocument();
-    });
-  });
-
-  describe("User interactions", () => {
-    test("allows typing in username field", async () => {
+  describe("Username validation", () => {
+    test("sets username and updates state", async () => {
       renderForm();
       const input = screen.getByLabelText("Username:");
 
@@ -41,141 +22,310 @@ describe("SmartSignupForm", () => {
       expect(input).toHaveValue("john");
     });
 
-    test("allows typing in password field", async () => {
+    test("handles empty username", async () => {
       renderForm();
-      const input = screen.getByLabelText("Password:");
-
-      await userEvent.type(input, "Password123");
-      expect(input).toHaveValue("Password123");
+      const passwordInput = screen.getByLabelText("Password:");
+      
+      await userEvent.type(passwordInput, "Password123");
+      await userEvent.click(screen.getByText("Sign Up"));
+      
+      await waitFor(() => {
+        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+      });
     });
 
-    test("handles form submission with valid data", async () => {
+    test("handles whitespace-only username", async () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-
-      await userEvent.type(usernameInput, "john");
+      
+      await userEvent.type(usernameInput, "   ");
       await userEvent.type(passwordInput, "Password123");
       await userEvent.click(screen.getByText("Sign Up"));
-
-      await waitFor(() => {
-        expect(screen.getByText("Success!")).toBeInTheDocument();
-      });
-    });
-
-    test("handles empty form submission", async () => {
-      renderForm();
-      await userEvent.click(screen.getByText("Sign Up"));
-
+      
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
     });
 
-    test("handles form submission with only username", async () => {
+    test("handles very long usernames", async () => {
       renderForm();
-      await userEvent.type(screen.getByLabelText("Username:"), "john");
-      await userEvent.click(screen.getByText("Sign Up"));
+      const usernameInput = screen.getByLabelText("Username:");
+      const longString = "a".repeat(100);
+      
+      await userEvent.type(usernameInput, longString);
+      expect(usernameInput).toHaveValue(longString);
+    });
 
+    test("handles special characters in username", async () => {
+      renderForm();
+      const usernameInput = screen.getByLabelText("Username:");
+      
+      await userEvent.type(usernameInput, "user@123!");
+      expect(usernameInput).toHaveValue("user@123!");
+    });
+  });
+
+  describe("Password validation", () => {
+    describe("Strong password requirements", () => {
+      test("accepts valid strong password", async () => {
+        renderForm();
+        const usernameInput = screen.getByLabelText("Username:");
+        const passwordInput = screen.getByLabelText("Password:");
+        
+        await userEvent.type(usernameInput, "john");
+        await userEvent.type(passwordInput, "Password123");
+        await userEvent.click(screen.getByText("Sign Up"));
+        
+        await waitFor(() => {
+          expect(screen.getByText("Success!")).toBeInTheDocument();
+        });
+      });
+
+      test("requires minimum length of 8 characters", async () => {
+        renderForm();
+        const usernameInput = screen.getByLabelText("Username:");
+        const passwordInput = screen.getByLabelText("Password:");
+        
+        await userEvent.type(usernameInput, "john");
+        await userEvent.type(passwordInput, "Pass1");
+        await userEvent.click(screen.getByText("Sign Up"));
+        
+        await waitFor(() => {
+          expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+        });
+      });
+
+      test("requires at least one uppercase letter", async () => {
+        renderForm();
+        const usernameInput = screen.getByLabelText("Username:");
+        const passwordInput = screen.getByLabelText("Password:");
+        
+        await userEvent.type(usernameInput, "john");
+        await userEvent.type(passwordInput, "password123");
+        await userEvent.click(screen.getByText("Sign Up"));
+        
+        await waitFor(() => {
+          expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+        });
+      });
+
+      test("requires at least one number", async () => {
+        renderForm();
+        const usernameInput = screen.getByLabelText("Username:");
+        const passwordInput = screen.getByLabelText("Password:");
+        
+        await userEvent.type(usernameInput, "john");
+        await userEvent.type(passwordInput, "Password");
+        await userEvent.click(screen.getByText("Sign Up"));
+        
+        await waitFor(() => {
+          expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+        });
+      });
+
+      test("accepts password with special characters", async () => {
+        renderForm();
+        const usernameInput = screen.getByLabelText("Username:");
+        const passwordInput = screen.getByLabelText("Password:");
+        
+        await userEvent.type(usernameInput, "john");
+        await userEvent.type(passwordInput, "Password123!@#");
+        await userEvent.click(screen.getByText("Sign Up"));
+        
+        await waitFor(() => {
+          expect(screen.getByText("Success!")).toBeInTheDocument();
+        });
+      });
+
+      test("accepts very long passwords", async () => {
+        renderForm();
+        const usernameInput = screen.getByLabelText("Username:");
+        const passwordInput = screen.getByLabelText("Password:");
+        const longPassword = "Password123" + "a".repeat(50);
+        
+        await userEvent.type(usernameInput, "john");
+        await userEvent.type(passwordInput, longPassword);
+        await userEvent.click(screen.getByText("Sign Up"));
+        
+        await waitFor(() => {
+          expect(screen.getByText("Success!")).toBeInTheDocument();
+        });
+      });
+    });
+
+    test("updates state when password changes", async () => {
+      renderForm();
+      const passwordInput = screen.getByLabelText("Password:");
+      
+      await userEvent.type(passwordInput, "newpassword");
+      expect(passwordInput).toHaveValue("newpassword");
+    });
+
+    test("handles empty password", async () => {
+      renderForm();
+      const usernameInput = screen.getByLabelText("Username:");
+      
+      await userEvent.type(usernameInput, "john");
+      await userEvent.click(screen.getByText("Sign Up"));
+      
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
     });
 
-    test("handles form submission with only password", async () => {
+    test("handles whitespace-only password", async () => {
       renderForm();
-      await userEvent.type(screen.getByLabelText("Password:"), "Password123");
+      const usernameInput = screen.getByLabelText("Username:");
+      const passwordInput = screen.getByLabelText("Password:");
+      
+      await userEvent.type(usernameInput, "john");
+      await userEvent.type(passwordInput, "        ");
       await userEvent.click(screen.getByText("Sign Up"));
-
+      
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
     });
   });
 
-  describe("Validation feedback", () => {
-    test("shows success message after fixing invalid submission", async () => {
+  describe("Form validation", () => {
+    test("success message when credentials are valid", async () => {
       renderForm();
-
-      // First submit with invalid data
-      await userEvent.type(screen.getByLabelText("Username:"), "john");
+      const usernameInput = screen.getByLabelText("Username:");
+      const passwordInput = screen.getByLabelText("Password:");
+      
+      await userEvent.type(usernameInput, "john");
+      await userEvent.type(passwordInput, "Password123");
       await userEvent.click(screen.getByText("Sign Up"));
-
-      await waitFor(() => {
-        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
-      });
-
-      // Fix the form and resubmit
-      await userEvent.type(screen.getByLabelText("Password:"), "Password123");
-      await userEvent.click(screen.getByText("Sign Up"));
-
+      
       await waitFor(() => {
         expect(screen.getByText("Success!")).toBeInTheDocument();
       });
     });
 
-    test("updates message when switching between valid and invalid states", async () => {
+    test("error message when only username is valid", async () => {
       renderForm();
       const usernameInput = screen.getByLabelText("Username:");
       const passwordInput = screen.getByLabelText("Password:");
-
-      // Submit valid form
+      
       await userEvent.type(usernameInput, "john");
-      await userEvent.type(passwordInput, "Password123");
+      await userEvent.type(passwordInput, "weak");
       await userEvent.click(screen.getByText("Sign Up"));
-
-      await waitFor(() => {
-        expect(screen.getByText("Success!")).toBeInTheDocument();
-      });
-
-      // Clear username and resubmit
-      await userEvent.clear(usernameInput);
-      await userEvent.click(screen.getByText("Sign Up"));
-
+      
       await waitFor(() => {
         expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
       });
+    });
+
+    test("error message when only password is valid", async () => {
+      renderForm();
+      const passwordInput = screen.getByLabelText("Password:");
+      
+      await userEvent.type(passwordInput, "Password123");
+      await userEvent.click(screen.getByText("Sign Up"));
+      
+      await waitFor(() => {
+        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+      });
+    });
+
+    test("error message when both credentials are invalid", async () => {
+      renderForm();
+      await userEvent.click(screen.getByText("Sign Up"));
+      
+      await waitFor(() => {
+        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+      });
+    });
+
+    test("validates form after fixing invalid data", async () => {
+      renderForm();
+      const usernameInput = screen.getByLabelText("Username:");
+      const passwordInput = screen.getByLabelText("Password:");
+      
+      // First submit with invalid data
+      await userEvent.type(usernameInput, "john");
+      await userEvent.type(passwordInput, "weak");
+      await userEvent.click(screen.getByText("Sign Up"));
+      
+      await waitFor(() => {
+        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+      });
+      
+      // Fix the password and resubmit
+      await userEvent.clear(passwordInput);
+      await userEvent.type(passwordInput, "Password123");
+      await userEvent.click(screen.getByText("Sign Up"));
+      
+      await waitFor(() => {
+        expect(screen.getByText("Success!")).toBeInTheDocument();
+      });
+    });
+
+    test("maintains validation state after multiple validates", async () => {
+      renderForm();
+      const usernameInput = screen.getByLabelText("Username:");
+      const passwordInput = screen.getByLabelText("Password:");
+      
+      await userEvent.type(usernameInput, "john");
+      await userEvent.type(passwordInput, "Password123");
+      
+      // Validate multiple times
+      await userEvent.click(screen.getByText("Sign Up"));
+      await waitFor(() => {
+        expect(screen.getByText("Success!")).toBeInTheDocument();
+      });
+      
+      await userEvent.click(screen.getByText("Sign Up"));
+      expect(screen.getByText("Success!")).toBeInTheDocument();
     });
   });
 
   describe("Edge cases", () => {
-    test("handles rapid form submissions", async () => {
+    test("handles rapid state changes", async () => {
       renderForm();
-      const submitButton = screen.getByText("Sign Up");
-
-      // Click submit button multiple times rapidly
-      await userEvent.click(submitButton);
-      await userEvent.click(submitButton);
-      await userEvent.click(submitButton);
-
+      const usernameInput = screen.getByLabelText("Username:");
+      const passwordInput = screen.getByLabelText("Password:");
+      
+      await userEvent.type(usernameInput, "john");
+      await userEvent.clear(usernameInput);
+      await userEvent.type(usernameInput, "jane");
+      
+      await userEvent.type(passwordInput, "Password123");
+      await userEvent.clear(passwordInput);
+      await userEvent.type(passwordInput, "Password456");
+      
+      await userEvent.click(screen.getByText("Sign Up"));
+      
       await waitFor(() => {
-        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+        expect(screen.getByText("Success!")).toBeInTheDocument();
       });
     });
 
-    test("handles whitespace-only inputs", async () => {
+    test("handles unicode characters", async () => {
       renderForm();
-
-      await userEvent.type(screen.getByLabelText("Username:"), "   ");
-      await userEvent.type(screen.getByLabelText("Password:"), "   ");
+      const usernameInput = screen.getByLabelText("Username:");
+      const passwordInput = screen.getByLabelText("Password:");
+      
+      await userEvent.type(usernameInput, "사용자");
+      await userEvent.type(passwordInput, "Password123");
       await userEvent.click(screen.getByText("Sign Up"));
-
+      
       await waitFor(() => {
-        expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+        expect(screen.getByText("Success!")).toBeInTheDocument();
       });
     });
 
-    test("handles very long inputs", async () => {
+    test("handles password with mixed unicode and ascii", async () => {
       renderForm();
-      const longString = "a".repeat(100);
-
-      await userEvent.type(screen.getByLabelText("Username:"), longString);
-      await userEvent.type(
-        screen.getByLabelText("Password:"),
-        "Password123" + longString
-      );
+      const usernameInput = screen.getByLabelText("Username:");
+      const passwordInput = screen.getByLabelText("Password:");
+      
+      await userEvent.type(usernameInput, "john");
+      await userEvent.type(passwordInput, "Password123한글");
       await userEvent.click(screen.getByText("Sign Up"));
-
+      
       await waitFor(() => {
         expect(screen.getByText("Success!")).toBeInTheDocument();
       });
