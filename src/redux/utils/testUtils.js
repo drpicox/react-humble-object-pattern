@@ -2,20 +2,14 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
-import signupReducer from '../controllers/SignupController';
+import { createStore } from '../store';
 
 // Helper function to render components with Redux provider
 export function renderWithRedux(
   ui,
   {
     initialState = {},
-    store = configureStore({
-      reducer: {
-        signup: signupReducer,
-      },
-      preloadedState: initialState,
-    }),
+    store = createStore(),
     ...renderOptions
   } = {}
 ) {
