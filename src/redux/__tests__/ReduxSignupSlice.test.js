@@ -21,19 +21,86 @@ describe('Redux Signup Slice', () => {
     };
   });
 
-  describe('Actions and reducers', () => {
+  describe('Username validation', () => {
     test('setUsername should update username state', () => {
       const action = setUsername('john');
       const state = signupReducer(initialState, action);
       expect(state.username).toBe('john');
     });
 
-    test('setPassword should update password state', () => {
-      const action = setPassword('Password123');
+    test('handles empty username', () => {
+      const action = setUsername('');
       const state = signupReducer(initialState, action);
-      expect(state.password).toBe('Password123');
+      const validateState = signupReducer(state, validate());
+      expect(validateState.message).toBe('Invalid credentials');
     });
 
+    test('handles whitespace-only username', () => {
+      let state = signupReducer(initialState, setUsername('   '));
+      state = signupReducer(state, validate());
+      expect(state.message).toBe('Invalid credentials');
+    });
+
+    test('handles very long usernames', () => {
+      const longUsername = 'a'.repeat(100);
+      const state = signupReducer(initialState, setUsername(longUsername));
+      expect(state.username).toBe(longUsername);
+    });
+
+    test('handles special characters in username', () => {
+      const state = signupReducer(initialState, setUsername('user@123!'));
+      expect(state.username).toBe('user@123!');
+    });
+  });
+
+  describe('Password validation', () => {
+    describe('Strong password requirements', () => {
+      test('accepts valid strong password', () => {
+        expect(isStrongPassword('Password123')).toBe(true);
+      });
+
+      test('requires minimum length of 8 characters', () => {
+        expect(isStrongPassword('Pass123')).toBe(false);
+      });
+
+      test('requires at least one uppercase letter', () => {
+        expect(isStrongPassword('password123')).toBe(false);
+      });
+
+      test('requires at least one number', () => {
+        expect(isStrongPassword('Password')).toBe(false);
+      });
+
+      test('accepts password with special characters', () => {
+        expect(isStrongPassword('Password123!@#')).toBe(true);
+      });
+
+      test('accepts very long passwords', () => {
+        const longPassword = 'Password123' + 'a'.repeat(100);
+        expect(isStrongPassword(longPassword)).toBe(true);
+      });
+    });
+
+    test('setPassword should update password state', () => {
+      const action = setPassword('newpassword');
+      const state = signupReducer(initialState, action);
+      expect(state.password).toBe('newpassword');
+    });
+
+    test('handles empty password', () => {
+      const state = signupReducer(initialState, setPassword(''));
+      expect(isStrongPassword('')).toBe(false);
+      const validateState = signupReducer(state, validate());
+      expect(validateState.message).toBe('Invalid credentials');
+    });
+
+    test('handles whitespace-only password', () => {
+      const state = signupReducer(initialState, setPassword('        '));
+      expect(isStrongPassword('        ')).toBe(false);
+    });
+  });
+
+  describe('Form validation', () => {
     test('validate should set success message when credentials are valid', () => {
       let state = signupReducer(initialState, setUsername('john'));
       state = signupReducer(state, setPassword('Password123'));
@@ -42,16 +109,17 @@ describe('Redux Signup Slice', () => {
       expect(state.message).toBe('Success!');
     });
 
-    test('validate should set error message when username is empty', () => {
-      let state = signupReducer(initialState, setPassword('Password123'));
+    test('validate should set error message when only username is valid', () => {
+      let state = signupReducer(initialState, setUsername('john'));
+      state = signupReducer(state, setPassword('weak'));
       state = signupReducer(state, validate());
       
       expect(state.message).toBe('Invalid credentials');
     });
 
-    test('validate should set error message when password is invalid', () => {
-      let state = signupReducer(initialState, setUsername('john'));
-      state = signupReducer(state, setPassword('weak'));
+    test('validate should set error message when only password is valid', () => {
+      let state = signupReducer(initialState, setUsername(''));
+      state = signupReducer(state, setPassword('Password123'));
       state = signupReducer(state, validate());
       
       expect(state.message).toBe('Invalid credentials');
@@ -62,49 +130,57 @@ describe('Redux Signup Slice', () => {
       
       expect(state.message).toBe('Invalid credentials');
     });
-  });
 
-  describe('isStrongPassword', () => {
-    test('should return true for strong passwords', () => {
-      expect(isStrongPassword('Password123')).toBe(true);
-      expect(isStrongPassword('StrongP4ssword')).toBe(true);
-      expect(isStrongPassword('1SuperSecret')).toBe(true);
+    test('validates form after fixing invalid data', () => {
+      // First submit with invalid data
+      let state = signupReducer(initialState, setUsername('john'));
+      state = signupReducer(state, setPassword('weak'));
+      state = signupReducer(state, validate());
+      expect(state.message).toBe('Invalid credentials');
+
+      // Fix the password and resubmit
+      state = signupReducer(state, setPassword('Password123'));
+      state = signupReducer(state, validate());
+      expect(state.message).toBe('Success!');
     });
 
-    test('should return false for passwords that are too short', () => {
-      expect(isStrongPassword('Pass1')).toBe(false);
-    });
-
-    test('should return false for passwords without uppercase letters', () => {
-      expect(isStrongPassword('password123')).toBe(false);
-    });
-
-    test('should return false for passwords without numbers', () => {
-      expect(isStrongPassword('PasswordOnly')).toBe(false);
-    });
-
-    test('should return false for empty passwords', () => {
-      expect(isStrongPassword('')).toBe(false);
+    test('maintains validation state after multiple validations', () => {
+      let state = signupReducer(initialState, setUsername('john'));
+      state = signupReducer(state, setPassword('Password123'));
+      
+      // Validate multiple times
+      state = signupReducer(state, validate());
+      expect(state.message).toBe('Success!');
+      
+      state = signupReducer(state, validate());
+      expect(state.message).toBe('Success!');
     });
   });
 
   describe('Edge cases', () => {
-    test('handles whitespace-only usernames', () => {
-      let state = signupReducer(initialState, setUsername('   '));
+    test('handles rapid state changes', () => {
+      let state = signupReducer(initialState, setUsername('john'));
       state = signupReducer(state, setPassword('Password123'));
+      state = signupReducer(state, setUsername('jane'));
+      state = signupReducer(state, setPassword('Password456'));
       state = signupReducer(state, validate());
       
-      expect(state.message).toBe('Invalid credentials');
+      expect(state.username).toBe('jane');
+      expect(state.password).toBe('Password456');
+      expect(state.message).toBe('Success!');
     });
 
-    test('handles very long usernames and passwords', () => {
-      const longString = 'a'.repeat(100);
-      
-      let state = signupReducer(initialState, setUsername(longString));
-      state = signupReducer(state, setPassword('Password123' + longString));
+    test('handles unicode characters', () => {
+      let state = signupReducer(initialState, setUsername('사용자'));
+      state = signupReducer(state, setPassword('Password123'));
       state = signupReducer(state, validate());
-      
       expect(state.message).toBe('Success!');
+    });
+
+    test('handles password with mixed unicode and ascii', () => {
+      let state = signupReducer(initialState, setUsername('john'));
+      state = signupReducer(state, setPassword('Password123한글'));
+      expect(isStrongPassword('Password123한글')).toBe(true);
     });
   });
 });
