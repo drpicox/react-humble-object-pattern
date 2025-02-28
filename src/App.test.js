@@ -13,8 +13,15 @@ test('renders implementation options', () => {
   expect(screen.getByText(/Redux/i)).toBeInTheDocument();
 });
 
-test('renders component type options', () => {
+test('renders component type controls', () => {
   render(<App />);
-  expect(screen.getByText(/Humble Component/i)).toBeInTheDocument();
-  expect(screen.getByText(/Smart Component/i)).toBeInTheDocument();
+  // Look for the h3 heading instead of labels that may appear multiple times
+  const componentTypeHeading = screen.getByRole('heading', { name: /Component Type:/i });
+  expect(componentTypeHeading).toBeInTheDocument();
+  
+  // Verify radio inputs exist
+  const humbleRadio = screen.getByRole('radio', { name: /Humble Component/i });
+  const smartRadio = screen.getByRole('radio', { name: /Smart Component/i });
+  expect(humbleRadio).toBeInTheDocument();
+  expect(smartRadio).toBeInTheDocument();
 });
