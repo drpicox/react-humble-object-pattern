@@ -8,6 +8,8 @@ This project compares different testing approaches for React applications, focus
 
 ### 1. Plain React Implementation
 
+[See this article for more details](https://medium.com/@drpicox/execute-react-tests-100x-faster-without-sacrificing-accuracy-b8594d201c06)
+
 - Located in `/src/plain` directory
 - Uses the following patterns:
   - **Controller Pattern**: Separates business logic into a standalone controller class
