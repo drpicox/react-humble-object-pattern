@@ -51,10 +51,21 @@ Each test file contains **exactly 23 tests** organized into the same categories:
 
 | Implementation        | Average Time (ms) | Type            | Speedup Factor |
 |----------------------|-------------------|-----------------|----------------|
-| Plain Controller     | 7-10              | Logic only      | ~175x          |
-| Redux Slice          | 7-11              | Logic only      | ~175x          |
-| Plain Humble Component | 1250-1300       | Full UI testing | 1x (baseline)  |
-| Plain Smart Component | 1250-1300        | Full UI testing | 1x (baseline)  |
-| Redux Component      | 1250-1350         | Full UI testing | 1x (baseline)  |
+| Plain Controller     | 9-12              | Logic only      | ~140x          |
+| Redux Slice          | 9-15              | Logic only      | ~130x          |
+| Plain Humble Component | 1350-1400       | Full UI testing | 1x (baseline)  |
+| Plain Smart Component | 1350-1400        | Full UI testing | 1x (baseline)  |
+| Redux Component      | 1400-1450         | Full UI testing | 1x (baseline)  |
 
 This confirms that the testing approach is consistent across all implementations. The performance benefits come from testing logic in isolation rather than through UI components, regardless of the state management approach used.
+
+## Implementation Notes
+
+1. **Testing the Public API**:
+   - Controller tests should validate through controller.validate() and check the controller.message property
+   - Redux tests should validate through store.dispatch(validate()) and check selectMessage(store.getState())
+   - Never test internal methods (like isStrongPassword) directly
+
+2. **Test Speed Improvement**:
+   - ~130-140x faster when testing business logic in isolation
+   - This dramatic improvement demonstrates the value of separating business logic from UI components

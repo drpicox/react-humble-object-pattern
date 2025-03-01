@@ -26,5 +26,9 @@ This project compares different testing approaches for React applications, focus
 - **Testing**: 
   - Controller/Redux tests: Test business logic in isolation (111x faster)
   - Component tests: Use React Testing Library with userEvent for UI interactions
+  - IMPORTANT: Never test internal methods directly (e.g., isStrongPassword)
+  - For controller tests: Use controller.validate() + check controller.message
+  - For Redux tests: Use store.dispatch(validate()) + check selectMessage(store.getState())
+  - Run tests in CI mode: `CI=1 npm test [testfile]` to avoid interactive mode
 - **Components**: Function components with hooks preferred over class components
 - **Error handling**: Validate inputs in controllers/Redux, display messages in components

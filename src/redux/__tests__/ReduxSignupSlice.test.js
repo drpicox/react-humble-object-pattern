@@ -3,7 +3,6 @@ import {
   setUsername,
   setPassword,
   validate,
-  isStrongPassword,
   selectUsername,
   selectPassword,
   selectMessage,
@@ -55,28 +54,46 @@ describe("Redux Signup Slice", () => {
   describe("Password validation", () => {
     describe("Strong password requirements", () => {
       test("accepts valid strong password", () => {
-        expect(isStrongPassword("Password123")).toBe(true);
+        store.dispatch(setUsername("john"));
+        store.dispatch(setPassword("Password123"));
+        store.dispatch(validate());
+        expect(selectMessage(store.getState())).toBe("Success!");
       });
 
       test("requires minimum length of 8 characters", () => {
-        expect(isStrongPassword("Pass123")).toBe(false);
+        store.dispatch(setUsername("john"));
+        store.dispatch(setPassword("Pass123")); // 7 characters
+        store.dispatch(validate());
+        expect(selectMessage(store.getState())).toBe("Invalid credentials");
       });
 
       test("requires at least one uppercase letter", () => {
-        expect(isStrongPassword("password123")).toBe(false);
+        store.dispatch(setUsername("john"));
+        store.dispatch(setPassword("password123"));
+        store.dispatch(validate());
+        expect(selectMessage(store.getState())).toBe("Invalid credentials");
       });
 
       test("requires at least one number", () => {
-        expect(isStrongPassword("Password")).toBe(false);
+        store.dispatch(setUsername("john"));
+        store.dispatch(setPassword("Password"));
+        store.dispatch(validate());
+        expect(selectMessage(store.getState())).toBe("Invalid credentials");
       });
 
       test("accepts password with special characters", () => {
-        expect(isStrongPassword("Password123!@#")).toBe(true);
+        store.dispatch(setUsername("john"));
+        store.dispatch(setPassword("Password123!@#"));
+        store.dispatch(validate());
+        expect(selectMessage(store.getState())).toBe("Success!");
       });
 
       test("accepts very long passwords", () => {
+        store.dispatch(setUsername("john"));
         const longPassword = "Password123" + "a".repeat(100);
-        expect(isStrongPassword(longPassword)).toBe(true);
+        store.dispatch(setPassword(longPassword));
+        store.dispatch(validate());
+        expect(selectMessage(store.getState())).toBe("Success!");
       });
     });
 
@@ -86,15 +103,17 @@ describe("Redux Signup Slice", () => {
     });
 
     test("handles empty password", () => {
+      store.dispatch(setUsername("john"));
       store.dispatch(setPassword(""));
-      expect(isStrongPassword("")).toBe(false);
       store.dispatch(validate());
       expect(selectMessage(store.getState())).toBe("Invalid credentials");
     });
 
     test("handles whitespace-only password", () => {
+      store.dispatch(setUsername("john"));
       store.dispatch(setPassword("        "));
-      expect(isStrongPassword("        ")).toBe(false);
+      store.dispatch(validate());
+      expect(selectMessage(store.getState())).toBe("Invalid credentials");
     });
   });
 
@@ -178,7 +197,8 @@ describe("Redux Signup Slice", () => {
     test("handles password with mixed unicode and ascii", () => {
       store.dispatch(setUsername("john"));
       store.dispatch(setPassword("Password123한글"));
-      expect(isStrongPassword("Password123한글")).toBe(true);
+      store.dispatch(validate());
+      expect(selectMessage(store.getState())).toBe("Success!");
     });
   });
 });

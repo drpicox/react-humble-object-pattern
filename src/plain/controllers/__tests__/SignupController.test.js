@@ -49,34 +49,46 @@ describe("SignupController", () => {
   describe("Password validation", () => {
     describe("Strong password requirements", () => {
       test("accepts valid strong password", () => {
+        controller.setUsername("john");
         controller.setPassword("Password123");
-        expect(controller.isStrongPassword()).toBe(true);
+        controller.validate();
+        expect(controller.message).toBe("Success!");
       });
 
       test("requires minimum length of 8 characters", () => {
+        controller.setUsername("john");
         controller.setPassword("Pass123"); // 7 characters
-        expect(controller.isStrongPassword()).toBe(false);
+        controller.validate();
+        expect(controller.message).toBe("Invalid credentials");
       });
 
       test("requires at least one uppercase letter", () => {
+        controller.setUsername("john");
         controller.setPassword("password123");
-        expect(controller.isStrongPassword()).toBe(false);
+        controller.validate();
+        expect(controller.message).toBe("Invalid credentials");
       });
 
       test("requires at least one number", () => {
+        controller.setUsername("john");
         controller.setPassword("Password");
-        expect(controller.isStrongPassword()).toBe(false);
+        controller.validate();
+        expect(controller.message).toBe("Invalid credentials");
       });
 
       test("accepts password with special characters", () => {
+        controller.setUsername("john");
         controller.setPassword("Password123!@#");
-        expect(controller.isStrongPassword()).toBe(true);
+        controller.validate();
+        expect(controller.message).toBe("Success!");
       });
 
       test("accepts very long passwords", () => {
+        controller.setUsername("john");
         const longPassword = "Password123" + "a".repeat(100);
         controller.setPassword(longPassword);
-        expect(controller.isStrongPassword()).toBe(true);
+        controller.validate();
+        expect(controller.message).toBe("Success!");
       });
     });
 
@@ -86,15 +98,17 @@ describe("SignupController", () => {
     });
 
     test("handles empty password", () => {
+      controller.setUsername("john");
       controller.setPassword("");
-      expect(controller.isStrongPassword()).toBe(false);
       controller.validate();
       expect(controller.message).toBe("Invalid credentials");
     });
 
     test("handles whitespace-only password", () => {
+      controller.setUsername("john");
       controller.setPassword("        ");
-      expect(controller.isStrongPassword()).toBe(false);
+      controller.validate();
+      expect(controller.message).toBe("Invalid credentials");
     });
   });
 
@@ -175,7 +189,8 @@ describe("SignupController", () => {
     test("handles password with mixed unicode and ascii", () => {
       controller.setUsername("john");
       controller.setPassword("Password123한글");
-      expect(controller.isStrongPassword()).toBe(true);
+      controller.validate();
+      expect(controller.message).toBe("Success!");
     });
   });
 });

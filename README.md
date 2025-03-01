@@ -40,17 +40,17 @@ Test suites cover:
 
 | Implementation        | Average Time (ms) | Type            | Speedup Factor |
 |----------------------|-------------------|-----------------|----------------|
-| Plain Controller     | 7-10              | Logic only      | ~175x          |
-| Redux Slice          | 7-11              | Logic only      | ~175x          |
-| Plain Humble Component | 1250-1300       | Full UI testing | 1x (baseline)  |
-| Plain Smart Component | 1250-1300        | Full UI testing | 1x (baseline)  |
-| Redux Component      | 1250-1350         | Full UI testing | 1x (baseline)  |
+| Plain Controller     | 9-12              | Logic only      | ~140x          |
+| Redux Slice          | 9-15              | Logic only      | ~130x          |
+| Plain Humble Component | 1350-1400       | Full UI testing | 1x (baseline)  |
+| Plain Smart Component | 1350-1400        | Full UI testing | 1x (baseline)  |
+| Redux Component      | 1400-1450         | Full UI testing | 1x (baseline)  |
 
 [See detailed test coverage matrix](./TEST_COVERAGE.md)
 
 ## Key Findings
 
-1. **Speedup Factor**: Testing business logic in isolation is approximately 175x faster than testing through component UI.
+1. **Speedup Factor**: Testing business logic in isolation is approximately 130-140x faster than testing through component UI.
 
 2. **Component Comparison**: 
    - Smart vs Humble components show negligible performance difference
@@ -58,7 +58,7 @@ Test suites cover:
    - The location of business logic has minimal impact on test performance
 
 3. **Test Stability**:
-   - Controller/Redux Slice tests show high consistency (variance: 7-11ms)
+   - Controller/Redux Slice tests show high consistency (variance: 9-15ms)
    - Component tests show higher but similar variance across implementations
 
 ## Conclusions
@@ -70,7 +70,8 @@ Test suites cover:
 3. **Test Strategy Recommendations**:
    - Use controller/Redux slice tests for comprehensive business logic validation
    - Use component tests for critical user interaction flows
-   - Consider the ~175x speedup when designing test strategies for large applications
+   - Consider the ~130-140x speedup when designing test strategies for large applications
+   - Test through the public API (validate/message) rather than internal methods
 
 ## Usage
 
