@@ -26,13 +26,13 @@ describe("ReduxSignupForm Component connects Redux", () => {
   };
 
   test("renders the form with username and password from Redux state", () => {
-    // Preparem l'estat inicial amb els selectors
+    // Prepare the state of Redux to have a username and password
     store.dispatch(setUsername("testuser"));
     store.dispatch(setPassword("Password123"));
 
     renderWithRedux(<ReduxSignupForm />);
 
-    // Verifiquem que els valors es mostren al formulari
+    // Verify that the form is rendered with the correct values
     const usernameInput = screen.getByLabelText(/username/i);
     const passwordInput = screen.getByLabelText(/password/i);
 
@@ -43,28 +43,28 @@ describe("ReduxSignupForm Component connects Redux", () => {
   test("updates username and password in Redux store when inputs change", () => {
     renderWithRedux(<ReduxSignupForm />);
 
-    // Interactuem amb els inputs
+    // Find the input fields and change their values
     const usernameInput = screen.getByLabelText(/username/i);
     const passwordInput = screen.getByLabelText(/password/i);
 
     fireEvent.change(usernameInput, { target: { value: "newuser" } });
     fireEvent.change(passwordInput, { target: { value: "NewPassword123" } });
 
-    // Verifiquem que els valors s'han actualitzat a Redux usant els selectors
+    // Verify that the values are updated in the Redux store
     const state = store.getState();
     expect(selectUsername(state)).toBe("newuser");
     expect(selectPassword(state)).toBe("NewPassword123");
   });
 
   test("displays validation message from Redux when form is submitted", () => {
-    // Preparem l'estat de Redux per tenir un missatge d'èxit
+    // Prepare the state of Redux to have a username and password
     store.dispatch(setUsername("validuser"));
     store.dispatch(setPassword("Password123"));
     store.dispatch({ type: "signup/validate" });
 
     renderWithRedux(<ReduxSignupForm />);
 
-    // Verifiquem que el missatge d'èxit es mostra
+    // Find the submit button and click it
     expect(screen.getByText("Success!")).toBeInTheDocument();
   });
 });
